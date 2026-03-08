@@ -210,10 +210,8 @@ export function PropertyDetails() {
                                         </Button>
 
                                         <Dialog open={isMessageOpen} onOpenChange={setIsMessageOpen}>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline" className="w-full" size="lg">
-                                                    <Mail className="h-4 w-4 mr-2" /> Request Details
-                                                </Button>
+                                            <DialogTrigger render={<Button variant="outline" className="w-full" size="lg" />}>
+                                                <Mail className="h-4 w-4 mr-2" /> Request Details
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-[425px]">
                                                 <DialogHeader>

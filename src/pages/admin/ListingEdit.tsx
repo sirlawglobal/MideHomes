@@ -60,7 +60,7 @@ export function ListingEdit() {
     const typeValue = watch('type');
     const statusValue = watch('status');
 
-    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [_imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>(existingListing?.images || []);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

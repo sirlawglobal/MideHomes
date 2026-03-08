@@ -47,7 +47,7 @@ export function ListingForm() {
     const typeValue = watch('type');
     const statusValue = watch('status');
 
-    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [_imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
