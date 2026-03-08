@@ -28,15 +28,15 @@ export function Home() {
                     </p>
 
                     {/* Search Bar */}
-                    <div className="bg-white p-2 rounded-full shadow-lg max-w-3xl mx-auto flex flex-col md:flex-row gap-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+                    <div className="bg-white p-4 md:p-2 rounded-2xl md:rounded-full shadow-lg max-w-3xl mx-auto flex flex-col md:flex-row gap-2 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
                         <div className="relative flex-1">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
                             <Input
                                 placeholder="Search by city, neighborhood or zip"
-                                className="pl-12 border-none bg-transparent focus-visible:ring-0 shadow-none text-base"
+                                className="pl-12 border-none bg-transparent focus-visible:ring-0 shadow-none text-base h-12 md:h-10"
                             />
                         </div>
-                        <Button size="lg" className="rounded-full bg-blue-900 hover:bg-blue-800 px-8">
+                        <Button size="lg" className="rounded-xl md:rounded-full bg-blue-900 hover:bg-blue-800 px-8 w-full md:w-auto h-12 md:h-auto">
                             Search
                         </Button>
                     </div>
