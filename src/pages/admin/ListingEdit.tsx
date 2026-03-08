@@ -9,6 +9,7 @@ import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { useListingStore } from '../../store/useListingStore';
+import { useCategoryStore } from '../../store/useCategoryStore';
 import { ArrowLeft, Save, UploadCloud, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -17,11 +18,12 @@ const listingSchema = z.object({
     description: z.string().min(20, 'Description must be at least 20 characters'),
     price: z.coerce.number().min(1, 'Price must be greater than 0'),
     location: z.string().min(3, 'Location is required'),
+    category: z.string().min(1, 'Category is required'),
     type: z.enum(['Rent', 'Buy', 'Short Let']),
     status: z.enum(['Active', 'Pending', 'Sold']),
-    bedrooms: z.coerce.number().min(0),
-    bathrooms: z.coerce.number().min(0),
-    sqft: z.coerce.number().min(100),
+    bedrooms: z.coerce.number().min(0).optional(),
+    bathrooms: z.coerce.number().min(0).optional(),
+    sqft: z.coerce.number().min(1),
 });
 
 type ListingFormValues = z.infer<typeof listingSchema>;
@@ -29,6 +31,7 @@ type ListingFormValues = z.infer<typeof listingSchema>;
 export function ListingEdit() {
     const { id } = useParams<{ id: string }>();
     const { listings, updateListing } = useListingStore();
+    const { categories } = useCategoryStore();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,6 +62,7 @@ export function ListingEdit() {
 
     const typeValue = watch('type');
     const statusValue = watch('status');
+    const categoryValue = watch('category');
 
     const [_imageFiles, setImageFiles] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>(existingListing?.images || []);
@@ -156,22 +160,43 @@ export function ListingEdit() {
                     <div className="space-y-6">
                         <h3 className="text-xl font-semibold text-slate-900 border-b pb-2">Specifications</h3>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="space-y-2">
+                                <Label>Select Category <span className="text-red-500">*</span></Label>
+                                <Select value={categoryValue} onValueChange={(v) => setValue('category', v as any)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.filter(c => c.status === 'Active').map(cat => (
+                                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.category && <p className="text-sm text-red-500">{errors.category.message}</p>}
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            {categoryValue !== 'Land' && (
+                                <>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bedrooms">Bedrooms</Label>
+                                        <Input id="bedrooms" type="number" {...register('bedrooms')} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bathrooms">Bathrooms</Label>
+                                        <Input id="bathrooms" type="number" step="0.5" {...register('bathrooms')} />
+                                    </div>
+                                </>
+                            )}
                             <div className="space-y-2">
-                                <Label htmlFor="bedrooms">Bedrooms</Label>
-                                <Input id="bedrooms" type="number" {...register('bedrooms')} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="bathrooms">Bathrooms</Label>
-                                <Input id="bathrooms" type="number" step="0.5" {...register('bathrooms')} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="sqft">Square Feet</Label>
+                                <Label htmlFor="sqft">{categoryValue === 'Land' ? 'Size (sqm/Plots)' : 'Square Feet (sqft)'}</Label>
                                 <Input id="sqft" type="number" {...register('sqft')} />
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Property Type</Label>
+                                <Label>Listing Type</Label>
                                 <Select value={typeValue} onValueChange={(v) => setValue('type', v as any)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
@@ -185,7 +210,7 @@ export function ListingEdit() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Status</Label>
+                                <Label>Visibility Status</Label>
                                 <Select value={statusValue} onValueChange={(v) => setValue('status', v as any)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select status" />

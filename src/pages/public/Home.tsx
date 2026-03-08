@@ -21,10 +21,10 @@ export function Home() {
 
                 <div className="relative z-20 text-center px-4 max-w-4xl mx-auto mt-16">
                     <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                        Find Your Dream Home
+                        Find Your Dream Home in Lagos
                     </h1>
                     <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-150">
-                        Discover the perfect property that matches your lifestyle. We offer the finest selection of luxury homes and modern apartments.
+                        Discover the finest properties across Ikoyi, Lekki, and beyond. MideHomes brings you the most exclusive listings in Nigeria.
                     </p>
 
                     {/* Search Bar */}

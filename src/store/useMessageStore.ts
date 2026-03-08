@@ -28,7 +28,7 @@ export const MOCK_MESSAGES: Message[] = [
         senderName: 'Alice Buyer',
         senderEmail: 'alice@example.com',
         senderPhone: '555-0100',
-        message: 'I am highly interested in the Beverly Hills villa. Can we schedule a viewing this weekend?',
+        message: 'I am highly interested in the luxury villa in Old Ikoyi. Can we schedule a viewing this weekend?',
         agentId: '1', // Belongs to John Admin
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
         read: false,

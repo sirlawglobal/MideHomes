@@ -97,8 +97,8 @@ export function PublicLayout() {
                     <div>
                         <h3 className="font-semibold text-white mb-4">Contact</h3>
                         <ul className="space-y-2 text-sm">
-                            <li>123 Luxury Lane</li>
-                            <li>New York, NY 10001</li>
+                            <li>Okota Road</li>
+                            <li>Ire Akari, Isolo, Lagos</li>
                             <li>hello@midehomes.com</li>
                         </ul>
                     </div>

@@ -19,11 +19,11 @@ interface LocationState {
 }
 
 export const MOCK_LOCATIONS: Location[] = [
-    { id: '1', city: 'Beverly Hills', state: 'California', properties: 45, status: 'Active' },
-    { id: '2', city: 'New York', state: 'New York', properties: 128, status: 'Active' },
-    { id: '3', city: 'Miami', state: 'Florida', properties: 67, status: 'Active' },
-    { id: '4', city: 'Austin', state: 'Texas', properties: 34, status: 'Active' },
-    { id: '5', city: 'Chicago', state: 'Illinois', properties: 52, status: 'Active' },
+    { id: '1', city: 'Ikoyi', state: 'Lagos', properties: 45, status: 'Active' },
+    { id: '2', city: 'Lekki', state: 'Lagos', properties: 128, status: 'Active' },
+    { id: '3', city: 'Victoria Island', state: 'Lagos', properties: 67, status: 'Active' },
+    { id: '4', city: 'Ikeja', state: 'Lagos', properties: 34, status: 'Active' },
+    { id: '5', city: 'Ajah', state: 'Lagos', properties: 52, status: 'Active' },
 ];
 
 export const useLocationStore = create<LocationState>()(

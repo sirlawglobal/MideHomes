@@ -145,7 +145,7 @@ export function Settings() {
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-slate-700 font-semibold">Default Timezone</Label>
-                                            <Input defaultValue="UTC-5 (Eastern Time)" className="bg-slate-50 focus-visible:bg-white h-11" />
+                                            <Input defaultValue="GMT+1 (West Africa Time)" className="bg-slate-50 focus-visible:bg-white h-11" />
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-slate-700 font-semibold">System Language</Label>
@@ -196,7 +196,7 @@ export function Settings() {
                                             <Label className="text-slate-700 font-semibold uppercase text-[10px] tracking-wider">Headquarters Address</Label>
                                             <div className="relative">
                                                 <MapPin className="absolute left-3 top-4 h-4 w-4 text-slate-400" />
-                                                <Textarea defaultValue="123 Luxury Lane, Beverly Hills, CA 90210" className="pl-10 min-h-[110px]" />
+                                                <Textarea defaultValue="Okota Road, Ire Akari, Isolo, Lagos" className="pl-10 min-h-[110px]" />
                                             </div>
                                         </div>
                                     </div>
