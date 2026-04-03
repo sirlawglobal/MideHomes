@@ -3,11 +3,12 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const listing = await prisma.listing.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 agent: {
                     select: {
@@ -34,12 +35,13 @@ export async function GET(
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const body = await request.json();
         const updatedListing = await prisma.listing.update({
-            where: { id: params.id },
+            where: { id },
             data: body,
         });
         return NextResponse.json(updatedListing);
@@ -51,11 +53,12 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         await prisma.listing.delete({
-            where: { id: params.id }
+            where: { id }
         });
         return NextResponse.json({ message: 'Property deleted successfully' });
     } catch (error) {

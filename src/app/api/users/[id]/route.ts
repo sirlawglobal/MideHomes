@@ -3,11 +3,12 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const user = await prisma.user.findUnique({
-            where: { id: params.id },
+            where: { id },
             select: {
                 id: true,
                 name: true,
@@ -15,7 +16,7 @@ export async function GET(
                 role: true,
                 status: true,
                 avatar: true,
-                createdAt: true,
+                joined: true,
                 listings: {
                     select: { id: true, title: true }
                 }
@@ -34,12 +35,13 @@ export async function GET(
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const body = await request.json();
         const updatedUser = await prisma.user.update({
-            where: { id: params.id },
+            where: { id },
             data: body,
         });
 
@@ -52,11 +54,12 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         await prisma.user.delete({
-            where: { id: params.id }
+            where: { id }
         });
         return NextResponse.json({ message: 'User deleted successfully' });
     } catch (error) {

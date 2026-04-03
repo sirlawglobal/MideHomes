@@ -3,12 +3,13 @@ import prisma from '@/lib/prisma';
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         const body = await request.json();
         const updatedLocation = await prisma.location.update({
-            where: { id: params.id },
+            where: { id },
             data: body,
         });
         return NextResponse.json(updatedLocation);
@@ -19,11 +20,12 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
     try {
         await prisma.location.delete({
-            where: { id: params.id }
+            where: { id }
         });
         return NextResponse.json({ message: 'Location deleted successfully' });
     } catch (error) {
