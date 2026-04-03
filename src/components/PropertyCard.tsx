@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
 import { BedDouble, Bath, Square, MapPin, Heart } from 'lucide-react';
@@ -11,14 +12,14 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
     const { user, isAuthenticated, toggleSavedProperty } = useAuthStore();
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const isSaved = user?.savedProperties?.includes(property.id) || false;
 
     const handleSave = (e: React.MouseEvent) => {
         e.preventDefault();
         if (!isAuthenticated) {
-            navigate('/login');
+            router.push('/login');
             return;
         }
         toggleSavedProperty(property.id);
@@ -50,7 +51,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
             <CardContent className="p-5">
                 <h3 className="font-bold text-xl text-slate-900 line-clamp-1 mb-2 group-hover:text-blue-600 transition-colors">
-                    <Link to={`/properties/${property.id}`} className="after:absolute after:inset-0">
+                    <Link href={`/properties/${property.id}`} className="after:absolute after:inset-0">
                         {property.title}
                     </Link>
                 </h3>

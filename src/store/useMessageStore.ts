@@ -1,71 +1,82 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
 export interface Message {
     id: string;
     listingId: string;
+    agentId: string;
     senderName: string;
     senderEmail: string;
     senderPhone?: string;
     message: string;
-    agentId: string;
+    status: 'Read' | 'Unread';
     createdAt: string;
-    read: boolean;
+    listing?: {
+        title: string;
+    };
 }
 
 interface MessageState {
     messages: Message[];
-    addMessage: (message: Omit<Message, 'id' | 'createdAt' | 'read'>) => void;
-    markAsRead: (id: string) => void;
-    deleteMessage: (id: string) => void;
+    isLoading: boolean;
+    error: string | null;
+    fetchMessages: (filters?: any) => Promise<void>;
+    addMessage: (message: Omit<Message, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+    updateMessageStatus: (id: string, status: 'Read' | 'Unread') => Promise<void>;
+    deleteMessage: (id: string) => Promise<void>;
 }
 
-// Initial mock data simulating a message to Admin A (1) and Admin B (2)
-export const MOCK_MESSAGES: Message[] = [
-    {
-        id: 'msg_1',
-        listingId: '1',
-        senderName: 'Alice Buyer',
-        senderEmail: 'alice@example.com',
-        senderPhone: '555-0100',
-        message: 'I am highly interested in the luxury villa in Old Ikoyi. Can we schedule a viewing this weekend?',
-        agentId: '1', // Belongs to John Admin
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-        read: false,
-    },
-    {
-        id: 'msg_2',
-        listingId: '2',
-        senderName: 'Bob Renter',
-        senderEmail: 'bob@example.com',
-        message: 'Is the downtown penthouse still available? Do you allow pets?',
-        agentId: '2', // Belongs to Sarah Jenkins
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-        read: true,
-    }
-];
+export const useMessageStore = create<MessageState>((set) => ({
+    messages: [],
+    isLoading: false,
+    error: null,
 
-export const useMessageStore = create<MessageState>()(
-    persist(
-        (set) => ({
-            messages: MOCK_MESSAGES,
-            addMessage: (msgData) => set((state) => ({
-                messages: [{
-                    id: Math.random().toString(36).substr(2, 9),
-                    ...msgData,
-                    createdAt: new Date().toISOString(),
-                    read: false
-                }, ...state.messages]
-            })),
-            markAsRead: (id) => set((state) => ({
-                messages: state.messages.map(m => m.id === id ? { ...m, read: true } : m)
-            })),
-            deleteMessage: (id) => set((state) => ({
-                messages: state.messages.filter(m => m.id !== id)
-            })),
-        }),
-        {
-            name: 'messages-storage',
+    fetchMessages: async (filters = {}) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.get('/api/messages', { params: filters });
+            set({ messages: response.data, isLoading: false });
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
         }
-    )
-);
+    },
+
+    addMessage: async (messageData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.post('/api/messages', messageData);
+            set((state) => ({ 
+                messages: [response.data, ...state.messages],
+                isLoading: false 
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    updateMessageStatus: async (id, status) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.patch(`/api/messages/${id}`, { status });
+            set((state) => ({
+                messages: state.messages.map((m) => (m.id === id ? { ...m, ...response.data } : m)),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    deleteMessage: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await axios.delete(`/api/messages/${id}`);
+            set((state) => ({
+                messages: state.messages.filter((m) => m.id !== id),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+}));

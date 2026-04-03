@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+  superadmin
+}
+
+enum ListingType {
+  Rent
+  Buy
+  Short_Let @map("Short Let")
+}
+
+enum ListingStatus {
+  Active
+  Pending
+  Sold
+}
+
+enum EntityStatus {
+  Active
+  Inactive
+}
+
+model User {
+  id              String        @id @default(uuid())
+  name            String
+  email           String        @unique
+  password        String        @default("password123") // Placeholder for migration
+  role            Role          @default(user)
+  avatar          String?
+  status          EntityStatus  @default(Active)
+  joined          DateTime      @default(now())
+  savedProperties Json?         // Array of listing IDs
+  listings        Listing[]     @relation("AgentListings")
+  messages        Message[]     @relation("AgentMessages")
+}
+
+model Listing {
+  id          String        @id @default(uuid())
+  title       String
+  description String        @db.Text
+  price       Float
+  location    String
+  category    String
+  type        ListingType
+  bedrooms    Int?
+  bathrooms   Float?
+  sqft        Int
+  status      ListingStatus @default(Active)
+  images      Json          // Array of image URLs
+  createdAt   DateTime      @default(now())
+  
+  agentId     String
+  agent       User          @relation("AgentListings", fields: [agentId], references: [id])
+  
+  messages    Message[]
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  status      EntityStatus  @default(Active)
+}
+
+model Location {
+  id        String        @id @default(uuid())
+  city      String
+  state     String
+  status    EntityStatus  @default(Active)
+
+  @@unique([city, state])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id])
+  
+  senderName  String
+  senderEmail String
+  senderPhone String?
+  message     String   @db.Text
+  
+  agentId     String
+  agent       User     @relation("AgentMessages", fields: [agentId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+}

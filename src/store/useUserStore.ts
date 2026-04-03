@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import axios from 'axios';
 import type { Role } from './useAuthStore';
 
 export interface UserEntity {
@@ -7,44 +7,72 @@ export interface UserEntity {
     name: string;
     email: string;
     role: Role;
-    joined: string;
+    joined?: string;
+    createdAt?: string;
     status: 'Active' | 'Inactive';
 }
 
 interface UserState {
     users: UserEntity[];
     isLoading: boolean;
-    setUsers: (users: UserEntity[]) => void;
-    addUser: (user: UserEntity) => void;
-    updateUser: (id: string, user: Partial<UserEntity>) => void;
-    deleteUser: (id: string) => void;
+    error: string | null;
+    fetchUsers: () => Promise<void>;
+    addUser: (user: Omit<UserEntity, 'id' | 'createdAt'>) => Promise<void>;
+    updateUser: (id: string, user: Partial<UserEntity>) => Promise<void>;
+    deleteUser: (id: string) => Promise<void>;
 }
 
-export const MOCK_USERS: UserEntity[] = [
-    { id: '1', name: 'John Admin', email: 'admin@midehomes.com', role: 'superadmin', joined: '2023-01-15', status: 'Active' },
-    { id: '2', name: 'Sarah Jenkins', email: 'sarah@midehomes.com', role: 'admin', joined: '2023-03-22', status: 'Active' },
-    { id: '3', name: 'David Wright', email: 'david@example.com', role: 'user', joined: '2023-06-10', status: 'Active' },
-    { id: '4', name: 'Emily Davis', email: 'emily@example.com', role: 'user', joined: '2023-08-05', status: 'Inactive' },
-];
+export const useUserStore = create<UserState>((set) => ({
+    users: [],
+    isLoading: false,
+    error: null,
 
-export const useUserStore = create<UserState>()(
-    persist(
-        (set) => ({
-            users: MOCK_USERS,
-            isLoading: false,
-            setUsers: (users) => set({ users }),
-            addUser: (user) => set((state) => ({ users: [user, ...state.users] })),
-            updateUser: (id, updatedFields) =>
-                set((state) => ({
-                    users: state.users.map((u) => (u.id === id ? { ...u, ...updatedFields } : u)),
-                })),
-            deleteUser: (id) =>
-                set((state) => ({
-                    users: state.users.filter((u) => u.id !== id),
-                })),
-        }),
-        {
-            name: 'users-storage',
+    fetchUsers: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.get('/api/users');
+            set({ users: response.data, isLoading: false });
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
         }
-    )
-);
+    },
+
+    addUser: async (userData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.post('/api/users', userData);
+            set((state) => ({ 
+                users: [response.data, ...state.users],
+                isLoading: false 
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    updateUser: async (id, updatedFields) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.patch(`/api/users/${id}`, updatedFields);
+            set((state) => ({
+                users: state.users.map((u) => (u.id === id ? { ...u, ...response.data } : u)),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    deleteUser: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await axios.delete(`/api/users/${id}`);
+            set((state) => ({
+                users: state.users.filter((u) => u.id !== id),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+}));

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
 export interface Category {
     id: string;
@@ -12,37 +12,64 @@ export interface Category {
 interface CategoryState {
     categories: Category[];
     isLoading: boolean;
-    setCategories: (categories: Category[]) => void;
-    addCategory: (category: Category) => void;
-    updateCategory: (id: string, category: Partial<Category>) => void;
-    deleteCategory: (id: string) => void;
+    error: string | null;
+    fetchCategories: () => Promise<void>;
+    addCategory: (category: Omit<Category, 'id' | 'count'>) => Promise<void>;
+    updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
+    deleteCategory: (id: string) => Promise<void>;
 }
 
-export const MOCK_CATEGORIES: Category[] = [
-    { id: '1', name: 'Residential', description: 'Homes, apartments, and condos', count: 145, status: 'Active' },
-    { id: '2', name: 'Commercial', description: 'Office spaces, retail, and warehouses', count: 32, status: 'Active' },
-    { id: '3', name: 'Land', description: 'Empty plots and agricultural land', count: 18, status: 'Active' },
-    { id: '4', name: 'Short Let', description: 'Vacation homes and short-term rentals', count: 89, status: 'Active' },
-];
+export const useCategoryStore = create<CategoryState>((set) => ({
+    categories: [],
+    isLoading: false,
+    error: null,
 
-export const useCategoryStore = create<CategoryState>()(
-    persist(
-        (set) => ({
-            categories: MOCK_CATEGORIES,
-            isLoading: false,
-            setCategories: (categories) => set({ categories }),
-            addCategory: (category) => set((state) => ({ categories: [category, ...state.categories] })),
-            updateCategory: (id, updatedFields) =>
-                set((state) => ({
-                    categories: state.categories.map((c) => (c.id === id ? { ...c, ...updatedFields } : c)),
-                })),
-            deleteCategory: (id) =>
-                set((state) => ({
-                    categories: state.categories.filter((c) => c.id !== id),
-                })),
-        }),
-        {
-            name: 'categories-storage',
+    fetchCategories: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.get('/api/categories');
+            set({ categories: response.data, isLoading: false });
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
         }
-    )
-);
+    },
+
+    addCategory: async (categoryData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.post('/api/categories', categoryData);
+            set((state) => ({ 
+                categories: [response.data, ...state.categories],
+                isLoading: false 
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    updateCategory: async (id, updatedFields) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.patch(`/api/categories/${id}`, updatedFields);
+            set((state) => ({
+                categories: state.categories.map((c) => (c.id === id ? { ...c, ...response.data } : c)),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    deleteCategory: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await axios.delete(`/api/categories/${id}`);
+            set((state) => ({
+                categories: state.categories.filter((c) => c.id !== id),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+}));

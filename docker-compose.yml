@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  midehomes_mysql:
+    image: mysql:8.0
+    container_name: midehomes_mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: midehomes_db
+      MYSQL_ROOT_PASSWORD: super_secure_root_123
+      MYSQL_USER: mide_app_user
+      MYSQL_PASSWORD: midepassword
+    ports:
+      - "3308:3306" # changed to avoid conflict
+    volumes:
+      - midehomes_mysql_storage:/var/lib/mysql
+    networks:
+      - midehomes_network
+
+  midehomes_adminer:
+    image: adminer:latest
+    container_name: midehomes_adminer_ui
+    restart: unless-stopped
+    ports:
+      - "8081:8080" # changed to avoid conflict
+    depends_on:
+      - midehomes_mysql
+    networks:
+      - midehomes_network
+
+volumes:
+  midehomes_mysql_storage:
+
+
+networks:
+  midehomes_network:
+    driver: bridge

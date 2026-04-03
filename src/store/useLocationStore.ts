@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
 export interface Location {
     id: string;
@@ -12,38 +12,64 @@ export interface Location {
 interface LocationState {
     locations: Location[];
     isLoading: boolean;
-    setLocations: (locations: Location[]) => void;
-    addLocation: (location: Location) => void;
-    updateLocation: (id: string, location: Partial<Location>) => void;
-    deleteLocation: (id: string) => void;
+    error: string | null;
+    fetchLocations: () => Promise<void>;
+    addLocation: (location: Omit<Location, 'id' | 'properties'>) => Promise<void>;
+    updateLocation: (id: string, location: Partial<Location>) => Promise<void>;
+    deleteLocation: (id: string) => Promise<void>;
 }
 
-export const MOCK_LOCATIONS: Location[] = [
-    { id: '1', city: 'Ikoyi', state: 'Lagos', properties: 45, status: 'Active' },
-    { id: '2', city: 'Lekki', state: 'Lagos', properties: 128, status: 'Active' },
-    { id: '3', city: 'Victoria Island', state: 'Lagos', properties: 67, status: 'Active' },
-    { id: '4', city: 'Ikeja', state: 'Lagos', properties: 34, status: 'Active' },
-    { id: '5', city: 'Ajah', state: 'Lagos', properties: 52, status: 'Active' },
-];
+export const useLocationStore = create<LocationState>((set) => ({
+    locations: [],
+    isLoading: false,
+    error: null,
 
-export const useLocationStore = create<LocationState>()(
-    persist(
-        (set) => ({
-            locations: MOCK_LOCATIONS,
-            isLoading: false,
-            setLocations: (locations) => set({ locations }),
-            addLocation: (location) => set((state) => ({ locations: [location, ...state.locations] })),
-            updateLocation: (id, updatedFields) =>
-                set((state) => ({
-                    locations: state.locations.map((l) => (l.id === id ? { ...l, ...updatedFields } : l)),
-                })),
-            deleteLocation: (id) =>
-                set((state) => ({
-                    locations: state.locations.filter((l) => l.id !== id),
-                })),
-        }),
-        {
-            name: 'locations-storage',
+    fetchLocations: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.get('/api/locations');
+            set({ locations: response.data, isLoading: false });
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
         }
-    )
-);
+    },
+
+    addLocation: async (locationData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.post('/api/locations', locationData);
+            set((state) => ({ 
+                locations: [response.data, ...state.locations],
+                isLoading: false 
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    updateLocation: async (id, updatedFields) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axios.patch(`/api/locations/${id}`, updatedFields);
+            set((state) => ({
+                locations: state.locations.map((l) => (l.id === id ? { ...l, ...response.data } : l)),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+
+    deleteLocation: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await axios.delete(`/api/locations/${id}`);
+            set((state) => ({
+                locations: state.locations.filter((l) => l.id !== id),
+                isLoading: false
+            }));
+        } catch (error: any) {
+            set({ error: error.message, isLoading: false });
+        }
+    },
+}));
