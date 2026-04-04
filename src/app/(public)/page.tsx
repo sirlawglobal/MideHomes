@@ -7,6 +7,7 @@ import { PropertyCard } from '@/components/PropertyCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Home as HomeIcon, Key, Calendar, Loader2 } from 'lucide-react';
+import { ServicesPopupBanner } from '@/components/ServicesPopupBanner';
 
 export default function HomePage() {
     const { listings, fetchListings, isLoading } = useListingStore();
@@ -19,6 +20,7 @@ export default function HomePage() {
 
     return (
         <div className="flex flex-col min-h-screen">
+            <ServicesPopupBanner />
             {/* Hero Section */}
             <section className="relative h-[600px] flex items-center justify-center">
                 <div className="absolute inset-0 bg-blue-900/40 z-10" />
