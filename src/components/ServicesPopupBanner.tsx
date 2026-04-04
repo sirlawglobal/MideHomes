@@ -15,7 +15,7 @@ export function ServicesPopupBanner() {
             if (!hasDismissed) {
                 setIsVisible(true);
             }
-        }, 60000);
+        }, 10000);
 
         return () => clearTimeout(timer);
     }, [hasDismissed]);
@@ -36,7 +36,7 @@ export function ServicesPopupBanner() {
                     className="fixed bottom-6 left-6 z-50 max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
                 >
                     <div className="bg-blue-900 p-4 text-white relative">
-                        <button 
+                        <button
                             onClick={handleDismiss}
                             className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
                         >
@@ -48,7 +48,7 @@ export function ServicesPopupBanner() {
                         </div>
                         <p className="text-blue-100 text-sm">We connect you with verified professionals.</p>
                     </div>
-                    
+
                     <div className="p-5 bg-slate-50">
                         <ul className="space-y-2 mb-4">
                             {[
@@ -65,7 +65,7 @@ export function ServicesPopupBanner() {
                                 </li>
                             ))}
                         </ul>
-                        
+
                         <Link href="/services" onClick={handleDismiss} className="flex items-center justify-center w-full bg-blue-100 text-blue-900 hover:bg-blue-200 transition-colors py-2 rounded-lg text-sm font-bold group">
                             Explore Services
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
