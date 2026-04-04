@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export async function GET() {
     try {
         const users = await prisma.user.findMany({
-            orderBy: { createdAt: 'desc' },
+            orderBy: { joined: 'desc' },
             select: {
                 id: true,
                 name: true,
@@ -12,7 +12,7 @@ export async function GET() {
                 role: true,
                 status: true,
                 avatar: true,
-                createdAt: true,
+                joined: true,
             }
         });
 

@@ -1,6 +1,0 @@
-{
-  "/api/listings/route": "app/api/listings/route.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/dashboard/developer/page": "app/dashboard/developer/page.js",
-  "/(public)/page": "app/(public)/page.js"
-}
