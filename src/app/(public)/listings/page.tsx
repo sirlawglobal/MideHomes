@@ -105,11 +105,13 @@ export default function ListingsPage() {
                     </div>
 
                     <Sheet>
-                        <SheetTrigger asChild>
+                        <SheetTrigger 
+                          render={
                             <Button variant="outline" className="md:hidden flex items-center gap-2">
                                 <SlidersHorizontal className="h-4 w-4" /> Filters
                             </Button>
-                        </SheetTrigger>
+                          }
+                        />
                         <SheetContent side="left">
                             <SheetHeader className="mb-6">
                                 <SheetTitle>Filters</SheetTitle>

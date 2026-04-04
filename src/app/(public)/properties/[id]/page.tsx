@@ -248,11 +248,13 @@ export default function PropertyDetailsPage() {
                                         </Button>
 
                                         <Dialog open={isMessageOpen} onOpenChange={setIsMessageOpen}>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline" className="w-full" size="lg">
-                                                    <Mail className="h-4 w-4 mr-2" /> Request Details
-                                                </Button>
-                                            </DialogTrigger>
+                                            <DialogTrigger 
+                                              render={
+                                                  <Button variant="outline" className="w-full" size="lg">
+                                                      <Mail className="h-4 w-4 mr-2" /> Request Details
+                                                  </Button>
+                                              }
+                                            />
                                             <DialogContent className="sm:max-w-[425px]">
                                                 <DialogHeader>
                                                     <DialogTitle>Contact Agent</DialogTitle>

@@ -48,6 +48,14 @@ export default function PublicLayout({
             >
               Properties
             </Link>
+            <Link
+              href="/services"
+              className={`text-sm font-medium hover:text-sky-600 transition-colors ${
+                pathname === "/services" ? "text-sky-600" : ""
+              }`}
+            >
+              Services
+            </Link>
             {isAuthenticated ? (
               <>
                 {user?.role === "admin" || user?.role === "superadmin" ? (
@@ -59,10 +67,10 @@ export default function PublicLayout({
                   </Link>
                 ) : (
                   <Link
-                    href="/profile"
+                    href={`/dashboard/${user?.role || 'user'}`}
                     className="text-sm font-medium text-sky-600 hover:text-sky-700 transition-colors"
                   >
-                    My Profile
+                    My Dashboard
                   </Link>
                 )}
                 <Button variant="outline" size="sm" onClick={logout}>
@@ -112,6 +120,13 @@ export default function PublicLayout({
             >
               Properties
             </Link>
+            <Link
+              href="/services"
+              className="text-sm font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Services
+            </Link>
             {isAuthenticated ? (
               <>
                 {user?.role === "admin" || user?.role === "superadmin" ? (
@@ -124,11 +139,11 @@ export default function PublicLayout({
                   </Link>
                 ) : (
                   <Link
-                    href="/profile"
+                    href={`/dashboard/${user?.role || 'user'}`}
                     className="text-sm font-medium text-sky-600"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    My Profile
+                    My Dashboard
                   </Link>
                 )}
                 <Button
@@ -187,6 +202,11 @@ export default function PublicLayout({
               <li>
                 <Link href="/listings" className="hover:text-emerald-400">
                   Search Properties
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-emerald-400">
+                  Professional Services
                 </Link>
               </li>
               <li>

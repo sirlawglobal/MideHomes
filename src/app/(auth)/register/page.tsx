@@ -17,6 +17,7 @@ const registerSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
     email: z.string().email({ message: "Invalid email address" }),
     password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+    role: z.enum(['user', 'developer', 'agent']),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -26,11 +27,16 @@ export default function RegisterPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormValues>({
-        resolver: zodResolver(registerSchema),
+    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<z.infer<typeof registerSchema>>({
+        resolver: zodResolver(registerSchema) as any,
+        defaultValues: {
+            role: 'user',
+        }
     });
 
-    const onSubmit = async (data: RegisterFormValues) => {
+    const selectedRole = watch('role');
+
+    const onSubmit = async (data: any) => {
         setIsLoading(true);
         try {
             await registerUser(data);
@@ -110,6 +116,36 @@ export default function RegisterPage() {
                                 className={errors.password ? "border-red-500" : ""}
                             />
                             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+                        </div>
+
+                        <div className="space-y-2 pb-2">
+                            <Label>I am a...</Label>
+                            <div className="grid grid-cols-3 gap-3">
+                                <Button 
+                                    type="button"
+                                    variant={selectedRole === 'user' ? 'default' : 'outline'} 
+                                    className={selectedRole === 'user' ? 'bg-blue-900 border-blue-900 text-white' : ''}
+                                    onClick={() => setValue('role', 'user')}
+                                >
+                                    Buyer / Renter
+                                </Button>
+                                <Button 
+                                    type="button"
+                                    variant={selectedRole === 'developer' ? 'default' : 'outline'} 
+                                    className={selectedRole === 'developer' ? 'bg-blue-900 border-blue-900 text-white' : ''}
+                                    onClick={() => setValue('role', 'developer')}
+                                >
+                                    Developer
+                                </Button>
+                                <Button 
+                                    type="button"
+                                    variant={selectedRole === 'agent' ? 'default' : 'outline'} 
+                                    className={selectedRole === 'agent' ? 'bg-blue-900 border-blue-900 text-white' : ''}
+                                    onClick={() => setValue('role', 'agent')}
+                                >
+                                    Agent
+                                </Button>
+                            </div>
                         </div>
 
                         <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800 h-11 mt-6" disabled={isLoading}>

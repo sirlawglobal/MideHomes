@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 
-export type Role = 'user' | 'admin' | 'superadmin' | null;
+export type Role = 'user' | 'developer' | 'agent' | 'admin' | 'superadmin' | null;
 
 interface User {
     id: string;

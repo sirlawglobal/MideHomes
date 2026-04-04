@@ -1,7 +1,6 @@
 {
   "/api/listings/route": "app/api/listings/route.js",
-  "/api/listings/[id]/route": "app/api/listings/[id]/route.js",
-  "/(public)/page": "app/(public)/page.js",
-  "/(public)/listings/page": "app/(public)/listings/page.js",
-  "/(public)/properties/[id]/page": "app/(public)/properties/[id]/page.js"
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/dashboard/developer/page": "app/dashboard/developer/page.js",
+  "/(public)/page": "app/(public)/page.js"
 }

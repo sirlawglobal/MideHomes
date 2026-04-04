@@ -17,6 +17,7 @@
     "@prisma/client": "^6.1.0",
     "axios": "^1.13.6",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.1",
     "lucide-react": "^0.577.0",
@@ -49,7 +50,7 @@
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0"
-},
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   }

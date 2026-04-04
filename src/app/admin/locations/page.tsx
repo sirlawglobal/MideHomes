@@ -69,11 +69,13 @@ export default function AdminLocationsPage() {
                         />
                     </div>
                     <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                        <DialogTrigger asChild>
+                        <DialogTrigger 
+                          render={
                             <Button className="bg-blue-900 hover:bg-blue-800">
                                 <Plus className="h-4 w-4 mr-2" /> Add Location
                             </Button>
-                        </DialogTrigger>
+                          }
+                        />
                         <DialogContent>
                             <DialogHeader>
                                 <DialogTitle>Add New Supported Location</DialogTitle>

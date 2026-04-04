@@ -94,11 +94,13 @@ export default function AdminUsersPage() {
                 </div>
 
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                    <DialogTrigger asChild>
+                    <DialogTrigger 
+                      render={
                         <Button className="bg-blue-900 hover:bg-blue-800">
                             <Plus className="h-4 w-4 mr-2" /> Add New User
                         </Button>
-                    </DialogTrigger>
+                      }
+                    />
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>Add New User</DialogTitle>
@@ -234,12 +236,14 @@ export default function AdminUsersPage() {
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0 text-slate-500">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                        <DropdownMenuTrigger 
+                                          render={
+                                              <Button variant="ghost" className="h-8 w-8 p-0 text-slate-500">
+                                                  <span className="sr-only">Open menu</span>
+                                                  <MoreHorizontal className="h-4 w-4" />
+                                              </Button>
+                                          }
+                                        />
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem onClick={() => openRoleDialog(u)}>
                                                     <ShieldAlert className="mr-2 h-4 w-4" /> Change Role

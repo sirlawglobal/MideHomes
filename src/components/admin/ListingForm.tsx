@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,8 +13,9 @@ import { useListingStore, Listing } from '@/store/useListingStore';
 import { useCategoryStore } from '@/store/useCategoryStore';
 import { useLocationStore } from '@/store/useLocationStore';
 import Link from 'next/link';
-import { UploadCloud, Save, X, Loader2 } from 'lucide-react';
+import { UploadCloud, Save, X, Loader2, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const listingSchema = z.object({
     title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -67,37 +68,77 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
     const statusValue = watch('status');
     const categoryValue = watch('category');
 
-    const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images || []);
+    // Existing Cloudinary URLs (from initial data or already uploaded)
+    const [uploadedUrls, setUploadedUrls] = useState<string[]>(initialData?.images || []);
+    // Pending files that haven't been uploaded yet
+    const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+    // Blob preview URLs for pending files
+    const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
-            // In a real app, we would upload to S3/Cloudinary and get URLs
-            // For now, we'll use blob URLs or placeholders to simulate local success
-            const newPreviews = files.map(file => URL.createObjectURL(file));
-            setImagePreviews(prev => [...prev, ...newPreviews]);
+            const previews = files.map(file => URL.createObjectURL(file));
+            setPendingFiles(prev => [...prev, ...files]);
+            setPendingPreviews(prev => [...prev, ...previews]);
         }
     };
 
     const removeImage = (index: number) => {
-        setImagePreviews(prev => {
-            const newPreviews = [...prev];
-            const url = newPreviews[index];
-            if (url.startsWith('blob:')) {
-                URL.revokeObjectURL(url);
-            }
-            newPreviews.splice(index, 1);
-            return newPreviews;
+        const totalUploaded = uploadedUrls.length;
+        if (index < totalUploaded) {
+            // Removing an already-uploaded Cloudinary image
+            setUploadedUrls(prev => prev.filter((_, i) => i !== index));
+        } else {
+            // Removing a pending (not yet uploaded) image
+            const pendingIndex = index - totalUploaded;
+            URL.revokeObjectURL(pendingPreviews[pendingIndex]);
+            setPendingFiles(prev => prev.filter((_, i) => i !== pendingIndex));
+            setPendingPreviews(prev => prev.filter((_, i) => i !== pendingIndex));
+        }
+    };
+
+    const uploadImages = async (files: File[]): Promise<string[]> => {
+        if (files.length === 0) return [];
+        const formData = new FormData();
+        files.forEach(file => formData.append('files', file));
+
+        const response = await axios.post('/api/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
+        return response.data.urls;
     };
 
     const handleFormSubmit = async (data: ListingFormValues) => {
         try {
-            await onSubmit(data, imagePreviews);
+            setIsUploading(true);
+
+            // Upload any pending files to Cloudinary
+            let newUrls: string[] = [];
+            if (pendingFiles.length > 0) {
+                toast.info(`Uploading ${pendingFiles.length} image(s)...`);
+                newUrls = await uploadImages(pendingFiles);
+            }
+
+            const allImageUrls = [...uploadedUrls, ...newUrls];
+
+            // Clean up blob URLs
+            pendingPreviews.forEach(url => URL.revokeObjectURL(url));
+            setPendingFiles([]);
+            setPendingPreviews([]);
+            setUploadedUrls(allImageUrls);
+
+            setIsUploading(false);
+            await onSubmit(data, allImageUrls);
         } catch (error) {
+            setIsUploading(false);
             console.error('Submit error:', error);
+            toast.error('Failed to upload images. Please try again.');
         }
     };
+
+    const allPreviews = [...uploadedUrls, ...pendingPreviews];
 
     return (
         <div className="bg-white rounded-xl shadow-sm border p-6 md:p-8">
@@ -223,11 +264,16 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
                 <div className="space-y-6">
                     <h3 className="text-xl font-semibold text-slate-900 border-b pb-2">Images</h3>
 
-                    {imagePreviews.length > 0 && (
+                    {allPreviews.length > 0 && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                            {imagePreviews.map((preview, idx) => (
+                            {allPreviews.map((preview, idx) => (
                                 <div key={idx} className="relative group rounded-xl overflow-hidden border">
                                     <img src={preview} alt="Preview" className="w-full h-32 object-cover" />
+                                    {idx >= uploadedUrls.length && (
+                                        <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                            Pending
+                                        </span>
+                                    )}
                                     <button
                                         type="button"
                                         onClick={() => removeImage(idx)}
@@ -254,9 +300,9 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
                             Cancel
                         </Button>
                     </Link>
-                    <Button type="submit" className="bg-blue-900 hover:bg-blue-800" disabled={isSubmitting}>
-                        {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                        {isSubmitting ? "Saving..." : (initialData ? "Update Listing" : "Save Listing")}
+                    <Button type="submit" className="bg-blue-900 hover:bg-blue-800" disabled={isSubmitting || isUploading}>
+                        {(isSubmitting || isUploading) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        {isUploading ? "Uploading Images..." : isSubmitting ? "Saving..." : (initialData ? "Update Listing" : "Save Listing")}
                     </Button>
                 </div>
             </form>

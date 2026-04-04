@@ -5,19 +5,29 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // 1. Create Super Admin
-  const superAdmin = await prisma.user.upsert({
-    where: { email: 'admin@midehomes.com' },
-    update: {},
-    create: {
-      name: 'Mide Admin',
-      email: 'admin@midehomes.com',
-      password: 'password123',
-      role: 'superadmin',
-      status: 'Active',
-    },
-  });
-  console.log('✅ Super Admin created');
+  // 1. Create Users for all roles
+  const users = [
+    { name: 'Mide Super Admin', email: 'superadmin@midehomes.com', role: 'superadmin' },
+    { name: 'Mide Admin', email: 'admin@midehomes.com', role: 'admin' },
+    { name: 'John Dev', email: 'developer@midehomes.com', role: 'developer' },
+    { name: 'Sarah Agent', email: 'agent@midehomes.com', role: 'agent' },
+    { name: 'Regular User', email: 'user@midehomes.com', role: 'user' },
+  ];
+
+  for (const u of users) {
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { role: u.role as any }, // Ensure role updates if already existing
+      create: {
+        name: u.name,
+        email: u.email,
+        password: 'password123',
+        role: u.role as any,
+        status: 'Active',
+      },
+    });
+  }
+  console.log('✅ Users created for all roles');
 
   // 2. Create Categories
   const categories = [

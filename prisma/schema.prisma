@@ -9,6 +9,8 @@ datasource db {
 
 enum Role {
   user
+  developer
+  agent
   admin
   superadmin
 }
