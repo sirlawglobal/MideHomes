@@ -7,6 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id              String       @id @default(uuid())
+  name            String
+  email           String       @unique
+  password        String       @default("password123")
+  role            Role         @default(user)
+  avatar          String?
+  status          EntityStatus @default(Active)
+  joined          DateTime     @default(now())
+  savedProperties Json?
+  listings        Listing[]    @relation("AgentListings")
+  messages        Message[]    @relation("AgentMessages")
+}
+
+model Listing {
+  id          String        @id @default(uuid())
+  title       String
+  description String        @db.Text
+  price       Float
+  location    String
+  category    String
+  type        ListingType
+  bedrooms    Int?
+  bathrooms   Float?
+  sqft        Int
+  status      ListingStatus @default(Active)
+  images      Json
+  createdAt   DateTime      @default(now())
+  agentId     String
+  agent       User          @relation("AgentListings", fields: [agentId], references: [id])
+  messages    Message[]
+
+  @@index([agentId], map: "Listing_agentId_fkey")
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  description String?
+  status      EntityStatus @default(Active)
+}
+
+model Location {
+  id     String       @id @default(uuid())
+  city   String
+  state  String
+  status EntityStatus @default(Active)
+
+  @@unique([city, state])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  listingId   String
+  senderName  String
+  senderEmail String
+  senderPhone String?
+  message     String   @db.Text
+  agentId     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  agent       User     @relation("AgentMessages", fields: [agentId], references: [id])
+  listing     Listing  @relation(fields: [listingId], references: [id])
+
+  @@index([agentId], map: "Message_agentId_fkey")
+  @@index([listingId], map: "Message_listingId_fkey")
+}
+
 enum Role {
   user
   developer
@@ -30,72 +98,4 @@ enum ListingStatus {
 enum EntityStatus {
   Active
   Inactive
-}
-
-model User {
-  id              String        @id @default(uuid())
-  name            String
-  email           String        @unique
-  password        String        @default("password123") // Placeholder for migration
-  role            Role          @default(user)
-  avatar          String?
-  status          EntityStatus  @default(Active)
-  joined          DateTime      @default(now())
-  savedProperties Json?         // Array of listing IDs
-  listings        Listing[]     @relation("AgentListings")
-  messages        Message[]     @relation("AgentMessages")
-}
-
-model Listing {
-  id          String        @id @default(uuid())
-  title       String
-  description String        @db.Text
-  price       Float
-  location    String
-  category    String
-  type        ListingType
-  bedrooms    Int?
-  bathrooms   Float?
-  sqft        Int
-  status      ListingStatus @default(Active)
-  images      Json          // Array of image URLs
-  createdAt   DateTime      @default(now())
-  
-  agentId     String
-  agent       User          @relation("AgentListings", fields: [agentId], references: [id])
-  
-  messages    Message[]
-}
-
-model Category {
-  id          String        @id @default(uuid())
-  name        String        @unique
-  description String?
-  status      EntityStatus  @default(Active)
-}
-
-model Location {
-  id        String        @id @default(uuid())
-  city      String
-  state     String
-  status    EntityStatus  @default(Active)
-
-  @@unique([city, state])
-}
-
-model Message {
-  id          String   @id @default(uuid())
-  listingId   String
-  listing     Listing  @relation(fields: [listingId], references: [id])
-  
-  senderName  String
-  senderEmail String
-  senderPhone String?
-  message     String   @db.Text
-  
-  agentId     String
-  agent       User     @relation("AgentMessages", fields: [agentId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  read        Boolean  @default(false)
 }

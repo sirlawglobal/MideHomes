@@ -15,7 +15,7 @@ export function ServicesPopupBanner() {
             if (!hasDismissed) {
                 setIsVisible(true);
             }
-        }, 10000);
+        }, 1200);
 
         return () => clearTimeout(timer);
     }, [hasDismissed]);
