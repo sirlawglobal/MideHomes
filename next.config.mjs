@@ -18,6 +18,15 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    async redirects() {
+        return [
+            {
+                source: '/admin/:path*',
+                destination: '/dashboard/:path*',
+                permanent: true,
+            },
+        ];
+    },
 };
 
 export default nextConfig;

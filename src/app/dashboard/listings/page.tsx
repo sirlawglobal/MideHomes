@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function AdminListingsPage() {
+export default function DashboardListingsPage() {
   const { listings, fetchListings, deleteListing, isLoading } = useListingStore();
   const { user } = useAuthStore();
   const router = useRouter();
@@ -34,7 +34,11 @@ export default function AdminListingsPage() {
     }
   };
 
-  const filteredListings = listings.filter(l =>
+  const displayListings = (user?.role === 'admin' || user?.role === 'superadmin')
+    ? listings
+    : listings.filter(l => l.agentId === user?.id);
+
+  const filteredListings = displayListings.filter(l =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     l.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -57,8 +61,8 @@ export default function AdminListingsPage() {
               className="pl-9"
             />
           </div>
-          {(user?.role === 'admin' || user?.role === 'superadmin') && (
-            <Link href="/admin/listings/new">
+          {(user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'agent' || user?.role === 'developer') && (
+            <Link href="/dashboard/listings/new">
               <Button className="bg-blue-900 hover:bg-blue-800">
                 <Plus className="h-4 w-4 mr-2" /> Add New
               </Button>
@@ -130,7 +134,7 @@ export default function AdminListingsPage() {
                         <DropdownMenuItem onClick={() => router.push(`/properties/${listing.id}`)}>
                           <Eye className="mr-2 h-4 w-4" /> View public page
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push(`/admin/listings/${listing.id}/edit`)}>
+                        <DropdownMenuItem onClick={() => router.push(`/dashboard/listings/${listing.id}/edit`)}>
                           <Edit className="mr-2 h-4 w-4" /> Edit details
                         </DropdownMenuItem>
                         <DropdownMenuItem

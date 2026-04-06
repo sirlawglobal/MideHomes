@@ -49,7 +49,7 @@ function LoginFormContent() {
             const role = data.email.includes('super') ? 'superadmin' : data.email.includes('admin') ? 'admin' : 'user';
             
             const callbackUrl = searchParams.get('callbackUrl');
-            const destination = role !== 'user' ? '/admin' : (callbackUrl || '/');
+            const destination = role !== 'user' ? '/dashboard' : (callbackUrl || '/');
             
             router.push(destination);
         } catch (error: any) {

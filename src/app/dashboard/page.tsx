@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useListingStore } from '@/store/useListingStore';
-import { Home, Eye, Users, TrendingUp } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
+import { Home, Eye, Users, TrendingUp, Bookmark, MessageCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const data = [
@@ -16,32 +17,50 @@ const data = [
     { name: 'Jul', views: 3490 },
 ];
 
-export default function AdminDashboardPage() {
+export default function DashboardOverviewPage() {
     const { listings, fetchListings } = useListingStore();
+    const { user } = useAuthStore();
 
     useEffect(() => {
         fetchListings();
     }, [fetchListings]);
 
-    const activeListings = listings.filter(l => l.status === 'Active').length;
-    const totalValue = listings.reduce((acc, l) => acc + (l.type === 'Buy' ? l.price : 0), 0);
+    // Role-based filtering
+    const displayListings = (user?.role === 'admin' || user?.role === 'superadmin')
+        ? listings
+        : listings.filter(l => l.agentId === user?.id);
+
+    const activeListings = displayListings.filter(l => l.status === 'Active').length;
+    const totalValue = displayListings.reduce((acc, l) => acc + (l.type === 'Buy' ? l.price : 0), 0);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-                <p className="text-slate-500 mt-1">Here's a summary of your property portfolio.</p>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight capitalize">
+                    {user?.role === 'user' ? 'Member Portal' : `${user?.role} Dashboard`}
+                </h1>
+                <p className="text-slate-500 mt-1">
+                    {user?.role === 'user' 
+                        ? "Welcome back! Manage your saved properties and messages here."
+                        : `Here's a summary of your ${user?.role === 'admin' || user?.role === 'superadmin' ? 'platform' : 'property'} portfolio.`}
+                </p>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="border-none shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Listings</CardTitle>
-                        <div className="p-2 bg-blue-50 rounded-lg"><Home className="h-4 w-4 text-blue-600" /></div>
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            {user?.role === 'user' ? 'Saved Properties' : 'Total Listings'}
+                        </CardTitle>
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                            {user?.role === 'user' ? <Bookmark className="h-4 w-4 text-blue-600" /> : <Home className="h-4 w-4 text-blue-600" />}
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{listings.length}</div>
+                        <div className="text-2xl font-bold text-slate-900">
+                            {user?.role === 'user' ? (user?.savedProperties?.length || 0) : displayListings.length}
+                        </div>
                         <p className="text-xs text-emerald-500 flex items-center mt-1">
                             <TrendingUp className="h-3 w-3 mr-1" /> +12% from last month
                         </p>
@@ -50,12 +69,20 @@ export default function AdminDashboardPage() {
 
                 <Card className="border-none shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Active Properties</CardTitle>
-                        <div className="p-2 bg-emerald-50 rounded-lg"><Home className="h-4 w-4 text-emerald-600" /></div>
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            {user?.role === 'user' ? 'Messages' : 'Active Properties'}
+                        </CardTitle>
+                        <div className="p-2 bg-emerald-50 rounded-lg">
+                            {user?.role === 'user' ? <MessageCircle className="h-4 w-4 text-emerald-600" /> : <Home className="h-4 w-4 text-emerald-600" />}
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{activeListings}</div>
-                        <p className="text-xs text-slate-500 mt-1">Properties currently on market</p>
+                        <div className="text-2xl font-bold text-slate-900">
+                            {user?.role === 'user' ? '0' : activeListings}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                            {user?.role === 'user' ? 'Inquiries sent to agents' : 'Properties currently on market'}
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -65,7 +92,9 @@ export default function AdminDashboardPage() {
                         <div className="p-2 bg-sky-50 rounded-lg"><Eye className="h-4 w-4 text-sky-600" /></div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">24.5k</div>
+                        <div className="text-2xl font-bold text-slate-900">
+                            {user?.role === 'user' ? '12' : '24.5k'}
+                        </div>
                         <p className="text-xs text-emerald-500 flex items-center mt-1">
                             <TrendingUp className="h-3 w-3 mr-1" /> +18% from last month
                         </p>
@@ -74,12 +103,18 @@ export default function AdminDashboardPage() {
 
                 <Card className="border-none shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Portfolio Value</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            {user?.role === 'user' ? 'Reward Points' : 'Total Portfolio Value'}
+                        </CardTitle>
                         <div className="p-2 bg-indigo-50 rounded-lg"><Users className="h-4 w-4 text-indigo-600" /></div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">${(totalValue / 1000000).toFixed(1)}M</div>
-                        <p className="text-xs text-slate-500 mt-1">Estimated total worth of 'Buy' properties</p>
+                        <div className="text-2xl font-bold text-slate-900">
+                            {user?.role === 'user' ? '450' : `$${(totalValue / 1000000).toFixed(1)}M`}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                            {user?.role === 'user' ? 'Earned from community engagement' : 'Estimated total worth of properties'}
+                        </p>
                     </CardContent>
                 </Card>
             </div>
@@ -115,8 +150,8 @@ export default function AdminDashboardPage() {
                             {[
                                 { label: 'New listing added', time: '2 hours ago', user: 'Admin' },
                                 { label: 'Property marked as sold', time: '5 hours ago', user: 'Super Admin' },
-                                { label: 'Price updated', time: '1 day ago', user: 'Admin' },
-                                { label: 'New user registered', time: '2 days ago', user: 'System' },
+                                { label: 'Price updated', time: '1 day ago', user: user?.name || 'Owner' },
+                                { label: 'Profile updated', time: '2 days ago', user: 'System' },
                             ].map((activity, i) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="mt-1 h-2 w-2 rounded-full bg-blue-500 shrink-0" />

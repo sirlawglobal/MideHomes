@@ -20,26 +20,45 @@ import {
 import { useState, useEffect } from "react";
 
 const SIDEBAR_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: Building, label: "Listings", href: "/admin/listings" },
-  { icon: Users, label: "Users", href: "/admin/users", roles: ["superadmin"] },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { 
+    icon: Building, 
+    label: "Listings", 
+    href: "/dashboard/listings",
+    roles: ["superadmin", "admin", "agent", "developer"] 
+  },
+  { 
+    icon: Users, 
+    label: "Users", 
+    href: "/dashboard/users", 
+    roles: ["superadmin", "admin"] 
+  },
   {
     icon: Tags,
     label: "Categories",
-    href: "/admin/categories",
-    roles: ["superadmin"],
+    href: "/dashboard/categories",
+    roles: ["superadmin", "admin"],
   },
-  { icon: MapPin, label: "Locations", href: "/admin/locations" },
-  { icon: MessageSquare, label: "Messages", href: "/admin/messages" },
+  { 
+    icon: MapPin, 
+    label: "Locations", 
+    href: "/dashboard/locations",
+    roles: ["superadmin", "admin"] 
+  },
+  { 
+    icon: MessageSquare, 
+    label: "Messages", 
+    href: "/dashboard/messages",
+    roles: ["superadmin", "admin", "agent", "developer"] 
+  },
   {
     icon: Settings,
     label: "Settings",
-    href: "/admin/settings",
-    roles: ["superadmin"],
+    href: "/dashboard/settings",
   },
 ];
 
-export default function AdminLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -53,13 +72,6 @@ export default function AdminLayout({
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/login?callbackUrl=" + pathname);
-    } else if (
-      !isLoading &&
-      user &&
-      user.role !== "admin" &&
-      user.role !== "superadmin"
-    ) {
-      router.push("/");
     }
   }, [isAuthenticated, isLoading, user, router, pathname]);
 
@@ -99,7 +111,7 @@ export default function AdminLayout({
           >
             <Building className="h-6 w-6 text-emerald-500" />
             <span>
-              Mide<span className="text-sky-500">Homes</span> Admin
+              Mide<span className="text-sky-500">Homes</span>
             </span>
           </Link>
           <button
@@ -114,7 +126,7 @@ export default function AdminLayout({
           {visibleItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (pathname.startsWith(item.href) && item.href !== "/admin");
+              (pathname.startsWith(item.href) && item.href !== "/dashboard");
             return (
               <Link
                 key={item.href}

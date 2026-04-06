@@ -174,7 +174,7 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
 
                         <div className="space-y-2">
                             <Label>Location / Address <span className="text-red-500">*</span></Label>
-                            <Select value={watch('location')} onValueChange={(v) => setValue('location', v)}>
+                            <Select value={watch('location') || ''} onValueChange={(v) => setValue('location', v as any)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select location" />
                                 </SelectTrigger>
@@ -198,7 +198,7 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div className="space-y-2">
                             <Label>Select Category <span className="text-red-500">*</span></Label>
-                            <Select value={categoryValue} onValueChange={(v) => setValue('category', v)}>
+                            <Select value={categoryValue || ''} onValueChange={(v) => setValue('category', v as any)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
@@ -232,7 +232,7 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
 
                         <div className="space-y-2">
                             <Label>Listing Type</Label>
-                            <Select value={typeValue} onValueChange={(v) => setValue('type', v as any)}>
+                            <Select value={typeValue || ''} onValueChange={(v) => setValue('type', v as any)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
@@ -246,7 +246,7 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
 
                         <div className="space-y-2">
                             <Label>Visibility Status</Label>
-                            <Select value={statusValue} onValueChange={(v) => setValue('status', v as any)}>
+                            <Select value={statusValue || ''} onValueChange={(v) => setValue('status', v as any)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
@@ -295,7 +295,7 @@ export function ListingForm({ initialData, onSubmit, isSubmitting }: ListingForm
                 </div>
 
                 <div className="flex justify-end gap-4 pt-6 border-t">
-                    <Link href="/admin/listings">
+                    <Link href="/dashboard/listings">
                         <Button type="button" variant="outline">
                             Cancel
                         </Button>

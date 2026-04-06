@@ -25,7 +25,7 @@ export default function NewListingPage() {
                 agentId: user?.id || 'unknown',
             });
             toast.success('Listing created successfully');
-            router.push('/admin/listings');
+            router.push('/dashboard/listings');
         } catch (error) {
             toast.error('Failed to create listing');
         } finally {
@@ -36,7 +36,7 @@ export default function NewListingPage() {
     return (
         <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-500 pb-12">
             <div className="flex items-center gap-4">
-                <Link href="/admin/listings">
+                <Link href="/dashboard/listings">
                     <Button variant="ghost" size="icon">
                         <ArrowLeft className="h-5 w-5 text-slate-500" />
                     </Button>

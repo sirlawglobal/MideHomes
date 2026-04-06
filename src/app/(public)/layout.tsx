@@ -58,21 +58,12 @@ export default function PublicLayout({
             </Link>
             {isAuthenticated ? (
               <>
-                {user?.role === "admin" || user?.role === "superadmin" ? (
-                  <Link
-                    href="/admin"
-                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-                  >
-                    Admin Dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/dashboard/${user?.role || 'user'}`}
-                    className="text-sm font-medium text-sky-600 hover:text-sky-700 transition-colors"
-                  >
-                    My Dashboard
-                  </Link>
-                )}
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-sky-600 hover:text-sky-700 transition-colors"
+                >
+                  My Dashboard
+                </Link>
                 <Button variant="outline" size="sm" onClick={logout}>
                   Logout
                 </Button>
@@ -129,23 +120,13 @@ export default function PublicLayout({
             </Link>
             {isAuthenticated ? (
               <>
-                {user?.role === "admin" || user?.role === "superadmin" ? (
-                  <Link
-                    href="/admin"
-                    className="text-sm font-medium text-emerald-600"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Admin Dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/dashboard/${user?.role || 'user'}`}
-                    className="text-sm font-medium text-sky-600"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    My Dashboard
-                  </Link>
-                )}
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-sky-600"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  My Dashboard
+                </Link>
                 <Button
                   variant="outline"
                   className="w-full"

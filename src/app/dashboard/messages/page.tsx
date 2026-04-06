@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mail, Reply, Trash2, CheckCircle2, User, Home, Phone, Calendar, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function AdminMessagesPage() {
+export default function DashboardMessagesPage() {
     const { user } = useAuthStore();
     const { messages, fetchMessages, updateMessageStatus, deleteMessage, isLoading } = useMessageStore();
     const { listings, fetchListings } = useListingStore();

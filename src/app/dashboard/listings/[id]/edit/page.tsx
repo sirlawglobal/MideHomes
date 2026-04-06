@@ -28,7 +28,7 @@ export default function EditListingPage() {
                 setInitialData(response.data);
             } catch (error) {
                 toast.error('Failed to load listing details');
-                router.push('/admin/listings');
+                router.push('/dashboard/listings');
             } finally {
                 setIsLoading(false);
             }
@@ -47,7 +47,7 @@ export default function EditListingPage() {
                 images: images.length > 0 ? images : initialData?.images,
             });
             toast.success('Listing updated successfully');
-            router.push('/admin/listings');
+            router.push('/dashboard/listings');
         } catch (error) {
             toast.error('Failed to update listing');
         } finally {
@@ -66,7 +66,7 @@ export default function EditListingPage() {
     return (
         <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-500 pb-12">
             <div className="flex items-center gap-4">
-                <Link href="/admin/listings">
+                <Link href="/dashboard/listings">
                     <Button variant="ghost" size="icon">
                         <ArrowLeft className="h-5 w-5 text-slate-500" />
                     </Button>
