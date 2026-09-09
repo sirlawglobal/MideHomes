@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id              String       @id @default(uuid())
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   email           String       @unique
   password        String       @default("password123")
@@ -22,9 +22,9 @@ model User {
 }
 
 model Listing {
-  id          String        @id @default(uuid())
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  description String        @db.Text
+  description String
   price       Float
   location    String
   category    String
@@ -35,22 +35,22 @@ model Listing {
   status      ListingStatus @default(Active)
   images      Json
   createdAt   DateTime      @default(now())
-  agentId     String
+  agentId     String        @db.ObjectId
   agent       User          @relation("AgentListings", fields: [agentId], references: [id])
   messages    Message[]
 
-  @@index([agentId], map: "Listing_agentId_fkey")
+  @@index([agentId])
 }
 
 model Category {
-  id          String       @id @default(uuid())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String       @unique
   description String?
   status      EntityStatus @default(Active)
 }
 
 model Location {
-  id     String       @id @default(uuid())
+  id     String       @id @default(auto()) @map("_id") @db.ObjectId
   city   String
   state  String
   status EntityStatus @default(Active)
@@ -59,20 +59,20 @@ model Location {
 }
 
 model Message {
-  id          String   @id @default(uuid())
-  listingId   String
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  listingId   String   @db.ObjectId
   senderName  String
   senderEmail String
   senderPhone String?
-  message     String   @db.Text
-  agentId     String
+  message     String
+  agentId     String   @db.ObjectId
   createdAt   DateTime @default(now())
   read        Boolean  @default(false)
   agent       User     @relation("AgentMessages", fields: [agentId], references: [id])
   listing     Listing  @relation(fields: [listingId], references: [id])
 
-  @@index([agentId], map: "Message_agentId_fkey")
-  @@index([listingId], map: "Message_listingId_fkey")
+  @@index([agentId])
+  @@index([listingId])
 }
 
 enum Role {
